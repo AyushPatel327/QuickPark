@@ -12,12 +12,14 @@ import javax.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.quickPark.entity.AuthoriseUser;
 import com.quickPark.entity.Block;
 import com.quickPark.entity.Customer;
 import com.quickPark.entity.Login;
 import com.quickPark.entity.MyBooking;
 import com.quickPark.entity.ShoppingMall;
 import com.quickPark.entity.Slot;
+import com.quickPark.exceptions.BookingNotFoundException;
 import com.quickPark.exceptions.CustomerNotPresentException;
 import com.quickPark.exceptions.EmptyFieldException;
 import com.quickPark.exceptions.MallNotFoundException;
@@ -152,7 +154,7 @@ public class CustomerServiceImpl implements CustomerService {
 	public List<ShoppingMall> findAllShoppingMall() {
 		// List<ShoppingMall> list = em.createQuery("select m from ShoppingMall
 		// m").getResultList();
-		
+
 		if (mallRepository.findAll().isEmpty()) {
 			throw new MallNotFoundException("No malls found");
 		} else
@@ -161,17 +163,16 @@ public class CustomerServiceImpl implements CustomerService {
 
 	// this method in progress
 	@Override
-	public MyBooking addBooking(int customerId, int mallId, int blockId, int slotId,int vehicleType, String vehicleNo) {
+	public MyBooking addBooking(int customerId, int mallId, int blockId, int slotId, int vehicleType,
+			String vehicleNo) {
 
 		Optional<Customer> customer = customerRepository.findById(customerId);
 		Optional<ShoppingMall> mall = mallRepository.findById(mallId);
-		
-		
+
 		if (customer.isEmpty() && mall.isEmpty()) {
 			throw new CustomerNotPresentException("Not found");
 		} else {
 
-			
 			MyBooking myBooking = new MyBooking();
 			myBooking.setCustomer(customer.get());
 			myBooking.setSlotDate(LocalDate.now());
@@ -252,15 +253,57 @@ public class CustomerServiceImpl implements CustomerService {
 
 	}
 	// this method in progress
-	
-	
 
-@Override
-	public List<MyBooking> viewAllMyBookings(){
-		List<MyBooking> book=myBookingRepository.findAll();
+	@Override
+	public List<MyBooking> viewAllMyBookings() {
+
+		if (myBookingRepository.findAll().isEmpty()) {
+			throw new BookingNotFoundException("No Booking Present");
+		}
+		List<MyBooking> book = myBookingRepository.findAll();
 		return book;
-		
-		
+
+	}
+
+	@Override
+	public List<MyBooking> viewBookingsByCustomerId(int customerId) {
+		List<MyBooking> customerBookings = new ArrayList<>();
+		if (customerRepository.findById(customerId).isEmpty()) {
+			throw new CustomerNotPresentException("Customer not exist!");
+		}
+
+		else {
+			Customer customer = customerRepository.findById(customerId).get();
+
+			List<MyBooking> bookings = myBookingRepository.findAll();
+
+			for (MyBooking myBooking : bookings) {
+				if (customer.equals(myBooking.getCustomer())) {
+					customerBookings.add(myBooking);
+				}
+			}
+		}
+
+		if (customerBookings.isEmpty() || customerBookings == null) {
+			throw new BookingNotFoundException("No booking found for customer");
+		} else {
+			return customerBookings;
+		}
+	}
+
+	public String authoriseCustomer(AuthoriseUser user) {
+		String status = "failed";
+		if (loginRepository.findAll().isEmpty()) {
+			throw new CustomerNotPresentException("No users found");
+		} else {
+			for (Login login : loginRepository.findAll()) {
+				if (login.getEmail() == user.getEmail() && login.getPassword() == user.getPassword()) {
+					status = "success";
+					break;
+				}
+			}
+		}
+		return status;
 	}
 
 }

@@ -46,25 +46,20 @@ public class ShoppingMallServiceImpl implements ShoppingMallService {
 
 	public ShoppingMall addShoppingMall(ShoppingMall mall, String role) {
 
-		if (mall.getMallEmail() == "") {
-			throw new EmptyFieldException("Enter the valid email");
-		}
-		if (mall.getPassword() == "") {
-			throw new EmptyFieldException("Enter the valid password");
-		}
-		if (mall.getMallName() == "") {
-			throw new EmptyFieldException("Enter the Mall name");
+		if (mall.getMallEmail() == "" || mall.getPassword() == "" || mall.getPassword() == "" || mall == null) {
+			throw new EmptyFieldException("Enter the valid Data");
+		} else {
+			Login login = new Login();
+			login.setEmail(mall.getMallEmail());
+			login.setPassword(mall.getPassword());
+			login.setRole(role);
+			mall.setLogin(login);
+
+			loginRepository.save(login);
+
+			return mallRepository.save(mall);
 		}
 
-		Login login = new Login();
-		login.setEmail(mall.getMallEmail());
-		login.setPassword(mall.getPassword());
-		login.setRole(role);
-		mall.setLogin(login);
-
-		loginRepository.save(login);
-
-		return mallRepository.save(mall);
 	}
 
 	@Override
@@ -151,46 +146,49 @@ public class ShoppingMallServiceImpl implements ShoppingMallService {
 	public List<Slot> viewAllSlots() {
 		if (slotRepository.findAll().isEmpty() || slotRepository.findAll() == null) {
 			throw new SlotNotAvailableException("No slots present");
+		} else {
+			return slotRepository.findAll();
+		}
+
+	}
+
+	@Transactional
+	public Block updateBlock(Block b, int blockId) {
+		Block block = em.find(Block.class, blockId);
+		if (block != null) {
+			block.setBlockName(b.getBlockName());
+			block.setBlockType(b.getBlockType());
+			return block;
 		}
 		else {
-			return slotRepository.findAll();
+			throw new NoSuchBlockExistsException("Block does not exist!");
 		}
 		
 	}
-	
-	  @Transactional
-		public Block updateBlock(Block b,int blockId) {
-			Block block= em.find(Block.class, blockId );
-			if(block != null) {
-				block.setBlockName(b.getBlockName());
-				block.setBlockType(b.getBlockType());
-			}
-			return block;
-		}
-		
 
-		
-		@Transactional
-		public Slot updateSlot(Slot slot, int slotId) {
-			// TODO Auto-generated method stub
-			Slot s=em.find(Slot.class, slotId);
-				if(s != null) {
-					s.setSlotNumber(slot.getSlotNumber());
-				}
-				return s;
-			}
-		
+	@Transactional
+	public Slot updateSlot(Slot slot, int slotId) {
+		// TODO Auto-generated method stub
+		Slot s = em.find(Slot.class, slotId);
+		if (s != null) {
+			s.setSlotNumber(slot.getSlotNumber());
 			
-	@Override
-	public void deleteSlot(@PathVariable int slotId) {
-		if(slotRepository.findById(slotId).isEmpty()) {
-			throw new  SlotNotAvailableException("slot not present");
+			return s;
 		}
 		else {
+			throw new SlotNotAvailableException("Slot doesn't exists!");
+		}
+		
+	}
+
+	@Override
+	public void deleteSlot(@PathVariable int slotId) {
+		if (slotRepository.findById(slotId).isEmpty()) {
+			throw new SlotNotAvailableException("slot not present");
+		} else {
 			mallRepository.deleteById(slotId);
 		}
 
-		
 	}
 
 }

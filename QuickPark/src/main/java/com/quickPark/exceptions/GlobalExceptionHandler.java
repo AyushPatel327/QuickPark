@@ -48,5 +48,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage());
 		return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.NOT_ACCEPTABLE);
 	}
+	
+	@ExceptionHandler(BookingNotFoundException.class)
+	public ResponseEntity<ErrorDetails> handleBookingNotFoundException(BookingNotFoundException ex) {
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage());
+		return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.NOT_FOUND);
+	}
 
 }

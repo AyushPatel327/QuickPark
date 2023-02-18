@@ -2,6 +2,7 @@ package com.quickPark.service;
 
 import java.util.List;
 
+import com.quickPark.entity.AuthoriseUser;
 import com.quickPark.entity.Customer;
 import com.quickPark.entity.MyBooking;
 import com.quickPark.entity.ShoppingMall;
@@ -18,4 +19,8 @@ public interface CustomerService {
 	public MyBooking addBooking(int customerId,int mallId,int blockId,int slotId,int vehicleType, String vehicleNo);
  
 	  List<MyBooking> viewAllMyBookings();
+	  
+	  public List<MyBooking> viewBookingsByCustomerId(int customerId);
+	  
+	  public String authoriseCustomer(AuthoriseUser user);
 }
