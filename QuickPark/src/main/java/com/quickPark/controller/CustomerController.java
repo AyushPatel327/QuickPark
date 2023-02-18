@@ -17,9 +17,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.quickPark.entity.AuthoriseUser;
+import com.quickPark.entity.Block;
 import com.quickPark.entity.Customer;
 import com.quickPark.entity.MyBooking;
 import com.quickPark.entity.ShoppingMall;
+import com.quickPark.entity.Slot;
 import com.quickPark.service.CustomerService;
 
 @RestController
@@ -82,5 +84,14 @@ public class CustomerController {
 	public ResponseEntity<String> login(@RequestBody AuthoriseUser user) {
 		return new ResponseEntity<String>(customerService.authoriseCustomer(user), HttpStatus.ACCEPTED);
 	}
+	
+	@GetMapping("{mallId}/selectedBlocks")
+	public ResponseEntity<List<Block>> viewBlockByMallIId(@PathVariable int mallId){
+		return new ResponseEntity<List<Block>>(customerService.viewAllBlocksByShoppingMallId(mallId),HttpStatus.OK);
+	}
 
+	@GetMapping("slots/{blockId}")
+	public ResponseEntity<List<Slot>> viewSlotsByBlockId(@PathVariable int blockId){
+		return new ResponseEntity<List<Slot>>(customerService.viewAllSlotsByBlockId(blockId),HttpStatus.OK);
+	}
 }

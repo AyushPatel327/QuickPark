@@ -34,4 +34,8 @@ public interface ShoppingMallService {
 
 	public String authoriseShoppingMall(AuthoriseUser user);
 
+	public List<Block> viewAllBlocksByShoppingMallId(int shoppingMallId);
+
+	public List<Slot> viewAllSlotsByBlockId(int blockId);
+
 }

@@ -1,5 +1,6 @@
 package com.quickPark.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -16,7 +17,6 @@ import com.quickPark.entity.Login;
 import com.quickPark.entity.ShoppingMall;
 import com.quickPark.entity.Slot;
 import com.quickPark.exceptions.CustomException;
-import com.quickPark.exceptions.CustomerNotPresentException;
 import com.quickPark.exceptions.EmptyFieldException;
 import com.quickPark.exceptions.MallNotFoundException;
 import com.quickPark.exceptions.NoSuchBlockExistsException;
@@ -207,6 +207,53 @@ public class ShoppingMallServiceImpl implements ShoppingMallService {
 			}
 		}
 		return status;
+	}
+	
+	
+	@Override
+	public List<Block> viewAllBlocksByShoppingMallId(int shoppingMallId) {
+		List<Block> shoppingBlocks = new ArrayList<>();
+		if (blockRepository.findAll().isEmpty()) {
+			throw new NoSuchBlockExistsException("No block found");
+		}
+
+		else {
+
+			for (Block block : blockRepository.findAll()) {
+				if (block.getMall().equals(mallRepository.findById(shoppingMallId).get())) {
+					shoppingBlocks.add(block);
+				}
+			}
+		}
+		if (shoppingBlocks.isEmpty()) {
+			throw new NoSuchBlockExistsException("Block is not availble for this Mall");
+		} else {
+			return shoppingBlocks;
+		}
+
+	}
+
+	@Override
+	public List<Slot> viewAllSlotsByBlockId(int blockId) {
+		List<Slot> availableSlots = new ArrayList<>();
+		if (blockRepository.findAll().isEmpty()) {
+			throw new NoSuchBlockExistsException("No block found");
+		}
+
+		else {
+
+			for (Slot slot : slotRepository.findAll()) {
+				if (slot.getBlock().equals(blockRepository.findById(blockId).get())) {
+					availableSlots.add(slot);
+				}
+			}
+		}
+		if (availableSlots.isEmpty()) {
+			throw new SlotNotAvailableException("Slots are not availble for this block");
+		} else {
+			return availableSlots;
+		}
+
 	}
 
 }
