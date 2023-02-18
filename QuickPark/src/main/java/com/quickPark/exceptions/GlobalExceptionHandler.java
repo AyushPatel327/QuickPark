@@ -15,37 +15,37 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(CustomerNotPresentException.class)
 	public ResponseEntity<ErrorDetails> handleCustomerNotPresentException(CustomerNotPresentException ex,
 			WebRequest request) {
-		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), ex.getMessage());
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage());
 		return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.NOT_FOUND);
 	}
 
 	@ExceptionHandler(CustomException.class)
 	public ResponseEntity<ErrorDetails> handleCustomException(CustomException ex, WebRequest request) {
-		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), ex.getMessage());
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage());
 		return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.NOT_FOUND);
 	}
 	
 	@ExceptionHandler(MallNotFoundException.class)
 	public ResponseEntity<ErrorDetails> handleMallNotFoundException(MallNotFoundException ex) {
-		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), ex.getMessage());
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage());
 		return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.NOT_FOUND);
 	}
 	
 	@ExceptionHandler(NoSuchBlockExistsException.class)
 	public ResponseEntity<ErrorDetails> handleNoSuchBlockExistsException(NoSuchBlockExistsException ex) {
-		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), ex.getMessage());
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage());
 		return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.NOT_FOUND);
 	}
 	
 	@ExceptionHandler(SlotNotAvailableException.class)
 	public ResponseEntity<ErrorDetails> handleSlotNotAvailableException(SlotNotAvailableException ex) {
-		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), ex.getMessage());
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage());
 		return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.NOT_FOUND);
 	}
 	
 	@ExceptionHandler(EmptyFieldException.class)
 	public ResponseEntity<ErrorDetails> handleEmptyFieldException(EmptyFieldException ex) {
-		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), ex.getMessage());
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage());
 		return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.NOT_ACCEPTABLE);
 	}
 

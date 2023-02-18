@@ -1,10 +1,11 @@
 package com.quickPark.exceptions;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor @NoArgsConstructor
+@Data @AllArgsConstructor @NoArgsConstructor
 public class NoSuchBlockExistsException extends RuntimeException {
 
-	private String messageString;
+	private String message;
 }

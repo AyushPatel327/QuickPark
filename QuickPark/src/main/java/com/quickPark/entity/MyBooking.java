@@ -42,6 +42,10 @@ public class MyBooking {
 
 	private float totalprice;
 	
+	private String vehicleNo;
+	
+	private int vehicleType; 
+	
 	@OneToOne
 	@JoinColumn(name = "mallId")
 	ShoppingMall mall;

@@ -72,5 +72,19 @@ public class ShoppingMallController {
 	public ResponseEntity<List<Slot>> viewAllSlots() {
 		return new ResponseEntity<List<Slot>>( mallService.viewAllSlots(),HttpStatus.FOUND);
 	}
+	
+	 @PutMapping("updateblock/{blockId}")
+		public ResponseEntity<Block> updateBlock(@RequestBody Block b,@PathVariable int blockId){
+			return new ResponseEntity<Block>(mallService.updateBlock(b,blockId),HttpStatus.CREATED);
+		}
+		@DeleteMapping("deleteslot/{slotId}")
+		public void deleteSlot(@PathVariable int slotId) {
+		
+			mallService.deleteSlot(slotId);
+		}
+		@PutMapping("updateSlot/{slotId}")
+		public ResponseEntity<Slot> updateSlot(@RequestBody Slot slot, @PathVariable int slotId){
+			return new ResponseEntity<Slot>(mallService.updateSlot(slot, slotId),HttpStatus.CREATED);
+		}
 
 }

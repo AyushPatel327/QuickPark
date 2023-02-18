@@ -26,4 +26,9 @@ public interface ShoppingMallService {
     public List<Slot> viewAllSlots();
     
     
+    public Block updateBlock(Block b,int blockId);
+    public void deleteSlot(int slotId);
+    public Slot updateSlot(Slot slot,int slotId);
+    
+    
 }

@@ -51,10 +51,16 @@ public class CustomerController {
 	public ResponseEntity<List<ShoppingMall>> findAllShoppingMalls() {
 		return new ResponseEntity<List<ShoppingMall>>( customerService.findAllShoppingMall(),HttpStatus.OK);
 	}
-	@PostMapping("/booking/{customerId}/{mallId}/{blockId}/{slotId}")
-	public ResponseEntity<MyBooking> addBooking(@PathVariable int customerId,@PathVariable int mallId,@PathVariable int blockId,@PathVariable int slotId){
+	@PostMapping("/booking/{customerId}/{mallId}/{blockId}/{slotId}/{vehicleType}/{vehicleNo}")
+	public ResponseEntity<MyBooking> addBooking(@PathVariable int customerId,@PathVariable int mallId,@PathVariable int blockId,@PathVariable int slotId,@PathVariable int vehicleType,@PathVariable String vehicleNo){
 		;
-		return new ResponseEntity<MyBooking> (customerService.addBooking(customerId, mallId, blockId, slotId), HttpStatus.OK);
+		return new ResponseEntity<MyBooking> (customerService.addBooking(customerId, mallId, blockId, slotId,vehicleType,vehicleNo	), HttpStatus.OK);
 	}
+	
+	 @GetMapping("/mybookings/viewAllMyBookings")
+		public ResponseEntity<List<MyBooking>> viewAllMyBookings(){
+			return new ResponseEntity<List<MyBooking>>(customerService.viewAllMyBookings(),HttpStatus.OK);
+			
+		}
 
 }

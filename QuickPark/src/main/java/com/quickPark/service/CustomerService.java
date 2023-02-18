@@ -15,6 +15,7 @@ public interface CustomerService {
 	List <Customer> getAllCustomers();
 	List <ShoppingMall> findAllShoppingMall();
 	//below one in progress
-	public MyBooking addBooking(int customerId,int mallId,int blockId,int slotId);
-
+	public MyBooking addBooking(int customerId,int mallId,int blockId,int slotId,int vehicleType, String vehicleNo);
+ 
+	  List<MyBooking> viewAllMyBookings();
 }

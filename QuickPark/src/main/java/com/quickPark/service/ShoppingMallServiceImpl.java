@@ -119,13 +119,12 @@ public class ShoppingMallServiceImpl implements ShoppingMallService {
 
 	@Override
 	public void deleteBlock(@PathVariable int blockId) {
-		if(blockRepository.findById(blockId).isEmpty()) {
+		if (blockRepository.findById(blockId).isEmpty()) {
 			throw new NoSuchBlockExistsException("Block not present");
-		}
-		else {
+		} else {
 			mallRepository.deleteById(blockId);
 		}
-		
+
 	}
 
 	@Override
@@ -141,17 +140,57 @@ public class ShoppingMallServiceImpl implements ShoppingMallService {
 
 	@Override
 	public List<Block> viewAllBlocks() {
-		if(blockRepository.findAll().isEmpty()) {
-			throw new CustomException("No blocks present");
+		if (blockRepository.findAll().isEmpty() || blockRepository.findAll() == null) {
+			throw new NoSuchBlockExistsException("No blocks present");
+		} else {
+			return blockRepository.findAll();
 		}
-		return blockRepository.findAll();
+
 	}
 
 	public List<Slot> viewAllSlots() {
-		if (slotRepository.findAll().isEmpty()) {
+		if (slotRepository.findAll().isEmpty() || slotRepository.findAll() == null) {
 			throw new SlotNotAvailableException("No slots present");
 		}
-		return slotRepository.findAll();
+		else {
+			return slotRepository.findAll();
+		}
+		
+	}
+	
+	  @Transactional
+		public Block updateBlock(Block b,int blockId) {
+			Block block= em.find(Block.class, blockId );
+			if(block != null) {
+				block.setBlockName(b.getBlockName());
+				block.setBlockType(b.getBlockType());
+			}
+			return block;
+		}
+		
+
+		
+		@Transactional
+		public Slot updateSlot(Slot slot, int slotId) {
+			// TODO Auto-generated method stub
+			Slot s=em.find(Slot.class, slotId);
+				if(s != null) {
+					s.setSlotNumber(slot.getSlotNumber());
+				}
+				return s;
+			}
+		
+			
+	@Override
+	public void deleteSlot(@PathVariable int slotId) {
+		if(slotRepository.findById(slotId).isEmpty()) {
+			throw new  SlotNotAvailableException("slot not present");
+		}
+		else {
+			mallRepository.deleteById(slotId);
+		}
+
+		
 	}
 
 }

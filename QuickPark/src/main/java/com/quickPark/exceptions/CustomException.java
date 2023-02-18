@@ -1,5 +1,8 @@
 package com.quickPark.exceptions;
 
+import lombok.Data;
+
+@Data
 public class CustomException extends RuntimeException {
 	private String message;
 

@@ -98,7 +98,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 		Login login = new Login();
 
-		if (fetchedCustomer.isEmpty()) {
+		if (fetchedCustomer.isEmpty() || fetchedCustomer == null) {
 			throw new CustomerNotPresentException("Not Present");
 		} else {
 //			fetchedCustomer.get().setCustomerId(customerId);
@@ -161,7 +161,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 	// this method in progress
 	@Override
-	public MyBooking addBooking(int customerId, int mallId, int blockId, int slotId) {
+	public MyBooking addBooking(int customerId, int mallId, int blockId, int slotId,int vehicleType, String vehicleNo) {
 
 		Optional<Customer> customer = customerRepository.findById(customerId);
 		Optional<ShoppingMall> mall = mallRepository.findById(mallId);
@@ -176,6 +176,8 @@ public class CustomerServiceImpl implements CustomerService {
 			myBooking.setCustomer(customer.get());
 			myBooking.setSlotDate(LocalDate.now());
 			myBooking.setStartTime(LocalTime.now());
+			myBooking.setVehicleNo(vehicleNo);
+			myBooking.setVehicleType(vehicleType);
 
 			// first find selected block
 			// List<Block> blockList = blockRepository.findAll();
@@ -250,5 +252,15 @@ public class CustomerServiceImpl implements CustomerService {
 
 	}
 	// this method in progress
+	
+	
+
+@Override
+	public List<MyBooking> viewAllMyBookings(){
+		List<MyBooking> book=myBookingRepository.findAll();
+		return book;
+		
+		
+	}
 
 }

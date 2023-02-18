@@ -1,5 +1,8 @@
 package com.quickPark.exceptions;
 
+import lombok.Data;
+
+@Data 
 public class CustomerNotPresentException extends RuntimeException {
 
 	public CustomerNotPresentException(String message) {
