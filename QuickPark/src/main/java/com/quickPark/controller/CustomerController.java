@@ -31,9 +31,9 @@ public class CustomerController {
 	@Autowired
 	private CustomerService customerService;
 
-	@PostMapping("{role}")
-	public ResponseEntity<Customer> addCustomer(@RequestBody Customer c, @PathVariable String role) {
-		Customer customer = customerService.addCustomer(c, role);
+	@PostMapping
+	public ResponseEntity<Customer> addCustomer(@RequestBody Customer c) {
+		Customer customer = customerService.addCustomer(c);
 		return new ResponseEntity<Customer>(customer, HttpStatus.OK);
 	}
 

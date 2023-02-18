@@ -30,9 +30,9 @@ public class ShoppingMallController {
 	@Autowired
 	private ShoppingMallService mallService;
 
-	@PostMapping("/addMall/{role}")
-	public ResponseEntity<ShoppingMall> addShoppingMall(@RequestBody ShoppingMall mall, @PathVariable String role) {
-		return new ResponseEntity<ShoppingMall>(mallService.addShoppingMall(mall, role), HttpStatus.OK);
+	@PostMapping("/addMall")
+	public ResponseEntity<ShoppingMall> addShoppingMall(@RequestBody ShoppingMall mall) {
+		return new ResponseEntity<ShoppingMall>(mallService.addShoppingMall(mall), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/shoppingMall/{mallId}")

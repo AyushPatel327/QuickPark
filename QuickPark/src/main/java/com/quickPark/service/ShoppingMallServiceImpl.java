@@ -10,11 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import com.quickPark.entity.AuthoriseUser;
 import com.quickPark.entity.Block;
 import com.quickPark.entity.Login;
 import com.quickPark.entity.ShoppingMall;
 import com.quickPark.entity.Slot;
 import com.quickPark.exceptions.CustomException;
+import com.quickPark.exceptions.CustomerNotPresentException;
 import com.quickPark.exceptions.EmptyFieldException;
 import com.quickPark.exceptions.MallNotFoundException;
 import com.quickPark.exceptions.NoSuchBlockExistsException;
@@ -44,7 +46,7 @@ public class ShoppingMallServiceImpl implements ShoppingMallService {
 	@Autowired
 	CustomerRepository customerRepository;
 
-	public ShoppingMall addShoppingMall(ShoppingMall mall, String role) {
+	public ShoppingMall addShoppingMall(ShoppingMall mall) {
 
 		if (mall.getMallEmail() == "" || mall.getPassword() == "" || mall.getPassword() == "" || mall == null) {
 			throw new EmptyFieldException("Enter the valid Data");
@@ -52,7 +54,7 @@ public class ShoppingMallServiceImpl implements ShoppingMallService {
 			Login login = new Login();
 			login.setEmail(mall.getMallEmail());
 			login.setPassword(mall.getPassword());
-			login.setRole(role);
+			login.setRole("admin");
 			mall.setLogin(login);
 
 			loginRepository.save(login);
@@ -189,6 +191,22 @@ public class ShoppingMallServiceImpl implements ShoppingMallService {
 			mallRepository.deleteById(slotId);
 		}
 
+	}
+
+	@Override
+	public String authoriseShoppingMall(AuthoriseUser user) {
+		String status = "failed";
+		if (mallRepository.findAll().isEmpty()) {
+			throw new MallNotFoundException("No users found");
+		} else {
+			for (Login login : loginRepository.findAll()) {
+				if (login.getEmail() == user.getEmail() && login.getPassword() == user.getPassword()&& login.getRole().toLowerCase() =="admin") {
+					status = "success";
+					break;
+				}
+			}
+		}
+		return status;
 	}
 
 }

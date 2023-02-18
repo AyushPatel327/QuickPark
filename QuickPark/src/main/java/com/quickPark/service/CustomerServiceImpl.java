@@ -55,7 +55,7 @@ public class CustomerServiceImpl implements CustomerService {
 	@Autowired
 	private SlotRepository slotRepository;
 
-	public Customer addCustomer(Customer c, String role) {
+	public Customer addCustomer(Customer c) {
 
 		if (c.getPassword() == "" || c.getCustomerEmail() == "") {
 			throw new EmptyFieldException("Enter the valid data");
@@ -65,7 +65,7 @@ public class CustomerServiceImpl implements CustomerService {
 			Login login = new Login();
 			login.setEmail(c.getCustomerEmail());
 			login.setPassword(c.getPassword());
-			login.setRole(role);
+			login.setRole("customer");
 			loginRepository.save(login);
 			customer.setLogin(login);
 
@@ -297,13 +297,59 @@ public class CustomerServiceImpl implements CustomerService {
 			throw new CustomerNotPresentException("No users found");
 		} else {
 			for (Login login : loginRepository.findAll()) {
-				if (login.getEmail() == user.getEmail() && login.getPassword() == user.getPassword()) {
+				if (login.getEmail() == user.getEmail() && login.getPassword() == user.getPassword()&&user.getRole().toLowerCase() == "customer") {
 					status = "success";
 					break;
 				}
 			}
 		}
 		return status;
+	}
+
+	@Override
+	public List<Block> viewAllBlocksByShoppingMallId(int shoppingMallId) {
+		List<Block> shoppingBlocks = new ArrayList<>();
+		if (blockRepository.findAll().isEmpty()) {
+			throw new NoSuchBlockExistsException("No block found");
+		}
+
+		else {
+
+			for (Block block : blockRepository.findAll()) {
+				if (block.getMall().equals(mallRepository.findById(shoppingMallId).get())) {
+					shoppingBlocks.add(block);
+				}
+			}
+		}
+		if (shoppingBlocks.isEmpty()) {
+			throw new NoSuchBlockExistsException("Block is not availble for this Mall");
+		} else {
+			return shoppingBlocks;
+		}
+
+	}
+
+	@Override
+	public List<Slot> viewAllSlotsByBlockId(int blockId) {
+		List<Slot> availableSlots = new ArrayList<>();
+		if (blockRepository.findAll().isEmpty()) {
+			throw new NoSuchBlockExistsException("No block found");
+		}
+
+		else {
+
+			for (Slot slot : slotRepository.findAll()) {
+				if (slot.getBlock().equals(blockRepository.findById(blockId).get())) {
+					availableSlots.add(slot);
+				}
+			}
+		}
+		if (availableSlots.isEmpty()) {
+			throw new SlotNotAvailableException("Slots are not availble for this block");
+		} else {
+			return availableSlots;
+		}
+
 	}
 
 }
