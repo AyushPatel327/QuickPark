@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import com.quickPark.entity.Block;
 import com.quickPark.entity.Customer;
 import com.quickPark.entity.Login;
 import com.quickPark.entity.MyBooking;
+import com.quickPark.entity.Payment;
 import com.quickPark.entity.ShoppingMall;
 import com.quickPark.entity.Slot;
 import com.quickPark.exceptions.BookingNotFoundException;
@@ -37,6 +39,10 @@ public class CustomerServiceImpl implements CustomerService {
 	@PersistenceContext
 	private EntityManager em;
 
+	public CustomerServiceImpl(CustomerRepository customerRepository) {
+		this.customerRepository = customerRepository;
+	}
+
 	@Autowired
 	private CustomerRepository customerRepository;
 
@@ -55,50 +61,40 @@ public class CustomerServiceImpl implements CustomerService {
 	@Autowired
 	private SlotRepository slotRepository;
 
-	public Customer addCustomer(Customer c) {
+	public Customer addCustomer(Customer customer) {
 
-		if (c.getPassword() == "" || c.getCustomerEmail() == "") {
+		if (customer.getPassword() == "" || customer.getCustomerEmail() == "") {
 			throw new EmptyFieldException("Enter the valid data");
 		} else {
-			Customer customer = customerRepository.save(c);
 
 			Login login = new Login();
-			login.setEmail(c.getCustomerEmail());
-			login.setPassword(c.getPassword());
+			login.setEmail(customer.getCustomerEmail());
+			login.setPassword(customer.getPassword());
 			login.setRole("customer");
-			loginRepository.save(login);
 			customer.setLogin(login);
 
-			return customerRepository.save(customer);
+			loginRepository.save(login);
+
+			Customer returnCustomer = customerRepository.save(customer);
+
+			return returnCustomer;
 		}
 
 	}
 
 	@Override
-	public int deleteCustomer(int customerId) {
+	public void deleteCustomer(int customerId) {
 
-		if (customerRepository.findById(customerId).isEmpty()) {
-			throw new CustomerNotPresentException("Can not find the customer");
-		}
-
-		else {
-
-			int delete = customerRepository.deleteCustomers(customerId);
-			if (delete != 0) {
-
-				return delete;
-
-			}
-			return delete;
-		}
+		customerRepository.deleteById(customerId);
 
 	}
 
 	@Override
+	@Transactional
 	public Customer updateCustomer(Customer updatedCustomer, int customerId) {
 		Optional<Customer> fetchedCustomer = customerRepository.findById(customerId);
 
-		Login login = new Login();
+		Login login = loginRepository.findById(fetchedCustomer.get().getLogin().getLoginId()).get();
 
 		if (fetchedCustomer.isEmpty() || fetchedCustomer == null) {
 			throw new CustomerNotPresentException("Not Present");
@@ -112,13 +108,26 @@ public class CustomerServiceImpl implements CustomerService {
 			fetchedCustomer.get().setCustomerEmail(updatedCustomer.getCustomerEmail());
 			login.setEmail(updatedCustomer.getCustomerEmail());
 
+			if (updatedCustomer.getCustomerEmail() == "") {
+				fetchedCustomer.get().setCustomerEmail(fetchedCustomer.get().getCustomerEmail());
+				// customerRepository.updateCustomerEmail(fetchedCustomer.get().getCustomerEmail(),
+				// customerId);
+			} else {
+				// fetchedCustomer.get().setCustomerEmail(updatedCustomer.getCustomerEmail());
+				customerRepository.updateCustomerEmail(updatedCustomer.getCustomerEmail(), customerId);
+			}
+
 			if (updatedCustomer.getPassword() == "") {
 				fetchedCustomer.get().setPassword(fetchedCustomer.get().getPassword());
 				login.setPassword(fetchedCustomer.get().getPassword());
+				// customerRepository.updateCustomerPassword(fetchedCustomer.get().getPassword(),
+				// customerId);
 
 			} else {
-				fetchedCustomer.get().setPassword(updatedCustomer.getPassword());
-				login.setPassword(updatedCustomer.getPassword());
+				// fetchedCustomer.get().setPassword(updatedCustomer.getPassword());
+				// login.setPassword(updatedCustomer.getPassword());
+
+				customerRepository.updateCustomerPassword(updatedCustomer.getPassword(), customerId);
 			}
 			if (updatedCustomer.getCustomerMobileNo() == 0) {
 				fetchedCustomer.get().setCustomerMobileNo(fetchedCustomer.get().getCustomerMobileNo());
@@ -127,16 +136,20 @@ public class CustomerServiceImpl implements CustomerService {
 			}
 			if (updatedCustomer.getCustomerName() == "") {
 				fetchedCustomer.get().setCustomerName(fetchedCustomer.get().getCustomerName());
+				// customerRepository.updateCustomerName(fetchedCustomer.get().getCustomerName(),
+				// customerId);
 			} else {
-				fetchedCustomer.get().setCustomerName(updatedCustomer.getCustomerName());
+				// fetchedCustomer.get().setCustomerName(updatedCustomer.getCustomerName());
+				customerRepository.updateCustomerName(updatedCustomer.getCustomerName(), customerId);
 			}
 
-			login.setRole(loginRepository
-					.findById(customerRepository.findById(customerId).get().getLogin().getLoginId()).get().getRole());
+			// login.setRole(loginRepository
+			// .findById(customerRepository.findById(customerId).get().getLogin().getLoginId()).get().getRole());
+
 			loginRepository.save(login);
 
 			fetchedCustomer.get().setLogin(login);
-			fetchedCustomer.get().setCustomerId(updatedCustomer.getCustomerId());
+			// fetchedCustomer.get().setCustomerId(fetchedCustomer.get().getCustomerId());
 		}
 
 		return customerRepository.save(fetchedCustomer.get());
@@ -145,10 +158,13 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public List<Customer> getAllCustomers() {
-		if (customerRepository.getAllCustomers().isEmpty()) {
-			throw new CustomerNotPresentException("No customers found");
+
+		if (customerRepository.findAll().isEmpty()) {
+			throw new CustomerNotPresentException("Customers not found");
 		}
-		return customerRepository.getAllCustomers();
+
+		return customerRepository.findAll();
+
 	}
 
 	public List<ShoppingMall> findAllShoppingMall() {
@@ -180,13 +196,9 @@ public class CustomerServiceImpl implements CustomerService {
 			myBooking.setVehicleNo(vehicleNo);
 			myBooking.setVehicleType(vehicleType);
 
-			// first find selected block
-			// List<Block> blockList = blockRepository.findAll();
-
-			// validate if present or not
-
-			// Setting Slot
+		
 			Slot selectedSlot;
+			
 			if (slotRepository.findById(slotId).isEmpty()) {
 				throw new SlotNotAvailableException("Slot not available");
 			} else {
@@ -201,6 +213,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 			// Setting Block
 			Block selectedBlock;
+			
 			if (blockRepository.findById(blockId).isEmpty()) {
 				throw new NoSuchBlockExistsException("Block not present");
 			} else {
@@ -215,19 +228,7 @@ public class CustomerServiceImpl implements CustomerService {
 			mall.get().setBlocks(blockList);
 			mallRepository.save(mall.get());
 
-			/*
-			 * List<Slot> slotsAvailble ; for(Block block: blockList) {
-			 * if(block.getMall().getMallId() == mall.get().getMallId()) { slotsAvailble =
-			 * block.getSlots();
-			 * 
-			 * //handle exceptions for not found selectedBlock =
-			 * blockRepository.findById(block.getBlockId()).get();
-			 * 
-			 * selectedBlock.get } }
-			 */
-
 			myBooking.setMall(mall.get());
-			myBooking.setEndTime(LocalTime.now().plusHours(1));
 			myBooking.setPayment("50");
 			myBooking.setStatus("Booked");
 			myBooking.setTotalprice(
@@ -239,11 +240,6 @@ public class CustomerServiceImpl implements CustomerService {
 
 			// set that booking into mybooking as well in Mybooking
 
-			/*
-			 * customer.get().setBookings(customerBookings);
-			 * customerRepository.save(customer.get());
-			 */
-
 			myBookingRepository.save(myBooking);
 
 			customerRepository.saveAndFlush(customer.get());
@@ -252,7 +248,60 @@ public class CustomerServiceImpl implements CustomerService {
 		}
 
 	}
-	// this method in progress
+
+//created payment class
+
+	@Override
+	public Payment checkout(int customerId) {
+
+		Payment payment = new Payment();
+
+		if (customerRepository.findById(customerId).isEmpty()) {
+			throw new CustomerNotPresentException("Customer does not exist!");
+		} else {
+			Customer customer = customerRepository.findById(customerId).get();
+
+			List<MyBooking> bookings = myBookingRepository.findAll();
+
+			if (bookings.isEmpty())
+
+				throw new BookingNotFoundException("No bookings ");
+
+			else {
+
+				for (MyBooking myBooking : bookings) {
+
+					if (myBooking.getCustomer().equals(customer)) {
+
+						long diffDuration = java.time.Duration.between(myBooking.getStartTime(), LocalTime.now())
+								.toHours();
+						payment.setTotalPrice(diffDuration * payment.getFarePerHour());
+						payment.setBookingId(myBooking.getBookingId());
+						payment.setDate(LocalDate.now());
+						payment.setStartTime(myBooking.getStartTime());
+						payment.setEndTime(LocalTime.now());
+						payment.setMessage("Success");
+
+						// setting myBooking
+						myBooking.setEndTime(LocalTime.now());
+						myBooking.setTotalprice(diffDuration * payment.getFarePerHour());
+						myBooking.setStatus("Completed");
+
+						myBookingRepository.save(myBooking);
+						break;
+
+					}
+
+				}
+				if (payment.getBookingId() <= 0) {
+					throw new BookingNotFoundException("No booking found for " + customer.getCustomerName());
+				}
+
+			}
+		}
+		return payment;
+
+	}
 
 	@Override
 	public List<MyBooking> viewAllMyBookings() {
@@ -267,37 +316,55 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public List<MyBooking> viewBookingsByCustomerId(int customerId) {
+
 		List<MyBooking> customerBookings = new ArrayList<>();
+
 		if (customerRepository.findById(customerId).isEmpty()) {
+
 			throw new CustomerNotPresentException("Customer not exist!");
+
 		}
 
 		else {
+
 			Customer customer = customerRepository.findById(customerId).get();
 
 			List<MyBooking> bookings = myBookingRepository.findAll();
 
 			for (MyBooking myBooking : bookings) {
+
 				if (customer.equals(myBooking.getCustomer())) {
+
 					customerBookings.add(myBooking);
 				}
 			}
 		}
 
 		if (customerBookings.isEmpty() || customerBookings == null) {
+
 			throw new BookingNotFoundException("No booking found for customer");
+
 		} else {
+
 			return customerBookings;
+
 		}
 	}
 
 	public String authoriseCustomer(AuthoriseUser user) {
+
 		String status = "failed";
+
 		if (loginRepository.findAll().isEmpty()) {
+
 			throw new CustomerNotPresentException("No users found");
+
 		} else {
+
 			for (Login login : loginRepository.findAll()) {
-				if (login.getEmail() == user.getEmail() && login.getPassword() == user.getPassword()&&user.getRole().toLowerCase() == "customer") {
+
+				if (login.getEmail() == user.getEmail() && login.getPassword() == user.getPassword()
+						&& user.getRole().toLowerCase() == "customer") {
 					status = "success";
 					break;
 				}
@@ -307,8 +374,10 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
-	public List<Block> viewAllBlocksByShoppingMallId(int shoppingMallId) {
+	public List<Block> viewAllBlocksByShoppingMallId(int shoppingMallId) {	
+		
 		List<Block> shoppingBlocks = new ArrayList<>();
+		
 		if (blockRepository.findAll().isEmpty()) {
 			throw new NoSuchBlockExistsException("No block found");
 		}
@@ -316,8 +385,10 @@ public class CustomerServiceImpl implements CustomerService {
 		else {
 
 			for (Block block : blockRepository.findAll()) {
+				
 				if (block.getMall().equals(mallRepository.findById(shoppingMallId).get())) {
 					shoppingBlocks.add(block);
+					
 				}
 			}
 		}
@@ -339,11 +410,14 @@ public class CustomerServiceImpl implements CustomerService {
 		else {
 
 			for (Slot slot : slotRepository.findAll()) {
+				
 				if (slot.getBlock().equals(blockRepository.findById(blockId).get())) {
 					availableSlots.add(slot);
+					
 				}
 			}
 		}
+		
 		if (availableSlots.isEmpty()) {
 			throw new SlotNotAvailableException("Slots are not availble for this block");
 		} else {

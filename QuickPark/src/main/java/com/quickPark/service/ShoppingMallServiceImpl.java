@@ -33,8 +33,12 @@ public class ShoppingMallServiceImpl implements ShoppingMallService {
 	@PersistenceContext
 	private EntityManager em;
 
-	@Autowired
-	private ShoppingMallRepository mallRepository;
+	/*
+	 * @Autowired private ShoppingMallRepository mallRepository;
+	 */
+	
+	ShoppingMallRepository mallRepository;
+	
 	@Autowired
 	private BlockRepository blockRepository;
 	@Autowired
@@ -45,6 +49,10 @@ public class ShoppingMallServiceImpl implements ShoppingMallService {
 
 	@Autowired
 	CustomerRepository customerRepository;
+	
+	public ShoppingMallServiceImpl(ShoppingMallRepository mallRepository) {
+		this.mallRepository= mallRepository;
+	}
 
 	public ShoppingMall addShoppingMall(ShoppingMall mall) {
 
@@ -95,12 +103,26 @@ public class ShoppingMallServiceImpl implements ShoppingMallService {
 	@Override
 	public List<ShoppingMall> getAllShoppingMalls() {
 
-		List<ShoppingMall> m = mallRepository.getAllShoppingMalls();
-		if (m.isEmpty()) {
-			throw new CustomException("No malls present");
-		} else
-			return m;
+		/*
+		 * // // if(mallRepository.findAll().isEmpty()) // { // throw new
+		 * MallNotFoundException("Malls Not found"); // }
+		 */			return mallRepository.findAll();
 	}
+	
+	
+
+	@Override
+	public ShoppingMall getShoppingMallByMallId(int mallId) {
+		
+		if(mallRepository.findById(mallId).isPresent())
+		return mallRepository.findById(mallId).get();
+		
+		else {
+			throw new MallNotFoundException("Mall does not exist");
+		}
+	}
+	
+	
 
 	@Override
 	public Block addBlock(Block block, int mallId) {
@@ -255,5 +277,6 @@ public class ShoppingMallServiceImpl implements ShoppingMallService {
 		}
 
 	}
+
 
 }

@@ -49,6 +49,11 @@ public class ShoppingMallController {
 	public ResponseEntity<List<ShoppingMall>> getAllShoppingMalls() {
 		return new ResponseEntity<List<ShoppingMall>>(mallService.getAllShoppingMalls(), HttpStatus.FOUND);
 	}
+	
+	@GetMapping("{mallId}")
+	public ResponseEntity<ShoppingMall> getShoppingMallById(@PathVariable int mallId){
+		return new ResponseEntity<ShoppingMall>(mallService.getShoppingMallByMallId(mallId), HttpStatus.OK);
+	}
 
 	@PostMapping("/addBlock/{mallId}")
 	public ResponseEntity<Block> addNewBlock(@RequestBody Block block, @PathVariable("mallId") int mallId) {
@@ -92,6 +97,16 @@ public class ShoppingMallController {
 	@PutMapping("updateSlot/{slotId}")
 	public ResponseEntity<Slot> updateSlot(@RequestBody Slot slot, @PathVariable int slotId) {
 		return new ResponseEntity<Slot>(mallService.updateSlot(slot, slotId), HttpStatus.CREATED);
+	}
+	
+	@GetMapping("viewBlocks/{mallId}/")
+	public ResponseEntity<List<Block>> viewBlockByMallIId(@PathVariable int mallId){
+		return new ResponseEntity<List<Block>>(mallService.viewAllBlocksByShoppingMallId(mallId),HttpStatus.OK);
+	}
+
+	@GetMapping("viewSlots/{blockId}")
+	public ResponseEntity<List<Slot>> viewSlotsByBlockId(@PathVariable int blockId){
+		return new ResponseEntity<List<Slot>>(mallService.viewAllSlotsByBlockId(blockId),HttpStatus.OK);
 	}
 
 }

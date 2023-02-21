@@ -6,14 +6,17 @@ import com.quickPark.entity.AuthoriseUser;
 import com.quickPark.entity.Block;
 import com.quickPark.entity.Customer;
 import com.quickPark.entity.MyBooking;
+import com.quickPark.entity.Payment;
 import com.quickPark.entity.ShoppingMall;
 import com.quickPark.entity.Slot;
 
 public interface CustomerService {
+	
+	
 
 	Customer addCustomer(Customer c);
 
-	int deleteCustomer(int customerId);
+	void deleteCustomer(int customerId);
 
 	public Customer updateCustomer(Customer c, int customerId);
 
@@ -24,6 +27,8 @@ public interface CustomerService {
 	// below one in progress
 	public MyBooking addBooking(int customerId, int mallId, int blockId, int slotId, int vehicleType, String vehicleNo);
 
+	public Payment checkout(int customerId);
+	
 	List<MyBooking> viewAllMyBookings();
 
 	public List<MyBooking> viewBookingsByCustomerId(int customerId);

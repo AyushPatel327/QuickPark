@@ -23,7 +23,8 @@ public class Slot {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int slotId;
 	private int slotNumber;
-
+	//
+	
 	@ManyToOne
 	@JsonIgnore
 	@JoinColumn(name = "blockId")

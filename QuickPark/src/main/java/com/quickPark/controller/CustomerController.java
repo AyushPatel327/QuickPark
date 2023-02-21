@@ -20,6 +20,7 @@ import com.quickPark.entity.AuthoriseUser;
 import com.quickPark.entity.Block;
 import com.quickPark.entity.Customer;
 import com.quickPark.entity.MyBooking;
+import com.quickPark.entity.Payment;
 import com.quickPark.entity.ShoppingMall;
 import com.quickPark.entity.Slot;
 import com.quickPark.service.CustomerService;
@@ -40,8 +41,8 @@ public class CustomerController {
 	}
 
 	@DeleteMapping("/{customerId}")
-	public ResponseEntity<Integer> deleteCustomers(@PathVariable("customerId") int customerId) {
-		return new ResponseEntity<Integer>(customerService.deleteCustomer(customerId), HttpStatus.OK);
+	public void deleteCustomer(@PathVariable("customerId") int customerId) {
+		customerService.deleteCustomer(customerId);
 	}
 
 	@PutMapping("/{customerId}")
@@ -63,9 +64,13 @@ public class CustomerController {
 	public ResponseEntity<MyBooking> addBooking(@PathVariable int customerId, @PathVariable int mallId,
 			@PathVariable int blockId, @PathVariable int slotId, @PathVariable int vehicleType,
 			@PathVariable String vehicleNo) {
-		;
+		
 		return new ResponseEntity<MyBooking>(
 				customerService.addBooking(customerId, mallId, blockId, slotId, vehicleType, vehicleNo), HttpStatus.OK);
+	}
+	@GetMapping("/checkout")
+	public ResponseEntity<Payment> checkout(int customerId){
+		return new ResponseEntity<Payment>(customerService.checkout(customerId),HttpStatus.ACCEPTED);
 	}
 
 	@GetMapping("/myBooking/viewAllMyBookings")
@@ -80,7 +85,7 @@ public class CustomerController {
 
 	}
 
-	@GetMapping("login")
+	@PostMapping("login")
 	public ResponseEntity<String> login(@RequestBody AuthoriseUser user) {
 		return new ResponseEntity<String>(customerService.authoriseCustomer(user), HttpStatus.ACCEPTED);
 	}

@@ -15,6 +15,8 @@ public interface ShoppingMallService {
 	public ShoppingMall updateShoppingMall(ShoppingMall m, int mallId);
 
 	List<ShoppingMall> getAllShoppingMalls();
+	
+	public ShoppingMall  getShoppingMallByMallId(int mallId);
 
 	Block addBlock(Block b, int mallId);
 
