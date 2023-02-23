@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.quickPark.entity.AuthoriseUser;
 import com.quickPark.entity.Block;
 import com.quickPark.entity.Customer;
+import com.quickPark.entity.Login;
 import com.quickPark.entity.MyBooking;
 import com.quickPark.entity.Payment;
-import com.quickPark.entity.ShoppingMall;
 import com.quickPark.entity.Slot;
 import com.quickPark.service.CustomerService;
 
@@ -55,10 +55,6 @@ public class CustomerController {
 		return new ResponseEntity<List<Customer>>(customerService.getAllCustomers(), HttpStatus.OK);
 	}
 
-	@GetMapping("/shoppingmalls")
-	public ResponseEntity<List<ShoppingMall>> findAllShoppingMalls() {
-		return new ResponseEntity<List<ShoppingMall>>(customerService.findAllShoppingMall(), HttpStatus.OK);
-	}
 
 	@PostMapping("/booking/{customerId}/{mallId}/{blockId}/{slotId}/{vehicleType}/{vehicleNo}")
 	public ResponseEntity<MyBooking> addBooking(@PathVariable int customerId, @PathVariable int mallId,
@@ -68,6 +64,7 @@ public class CustomerController {
 		return new ResponseEntity<MyBooking>(
 				customerService.addBooking(customerId, mallId, blockId, slotId, vehicleType, vehicleNo), HttpStatus.OK);
 	}
+	
 	@GetMapping("/checkout")
 	public ResponseEntity<Payment> checkout(int customerId){
 		return new ResponseEntity<Payment>(customerService.checkout(customerId),HttpStatus.ACCEPTED);
@@ -98,5 +95,10 @@ public class CustomerController {
 	@GetMapping("slots/{blockId}")
 	public ResponseEntity<List<Slot>> viewSlotsByBlockId(@PathVariable int blockId){
 		return new ResponseEntity<List<Slot>>(customerService.viewAllSlotsByBlockId(blockId),HttpStatus.OK);
+	}
+	
+	@GetMapping("allLogins")
+	public ResponseEntity<List<Login>> getAllLogin(){
+		return new ResponseEntity<List<Login>>(customerService.showAllLogin(),HttpStatus.OK);
 	}
 }

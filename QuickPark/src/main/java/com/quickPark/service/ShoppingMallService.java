@@ -8,6 +8,9 @@ import com.quickPark.entity.ShoppingMall;
 import com.quickPark.entity.Slot;
 
 public interface ShoppingMallService {
+
+	public String authoriseShoppingMall(AuthoriseUser user);
+
 	ShoppingMall addShoppingMall(ShoppingMall m);
 
 	int deleteShoppingMall(int mallId);
@@ -15,8 +18,8 @@ public interface ShoppingMallService {
 	public ShoppingMall updateShoppingMall(ShoppingMall m, int mallId);
 
 	List<ShoppingMall> getAllShoppingMalls();
-	
-	public ShoppingMall  getShoppingMallByMallId(int mallId);
+
+	public ShoppingMall getShoppingMallByMallId(int mallId);
 
 	Block addBlock(Block b, int mallId);
 
@@ -24,19 +27,17 @@ public interface ShoppingMallService {
 
 	public List<Block> viewAllBlocks();
 
-	public Slot addSlot(Slot slot, int blockId);
-
-	public List<Slot> viewAllSlots();
-
 	public Block updateBlock(Block b, int blockId);
 
-	public void deleteSlot(int slotId);
+	public List<Block> viewAllBlocksByShoppingMallId(int shoppingMallId);
+
+	public int addSlot(Slot slot, int blockId, int noOfSlots);
 
 	public Slot updateSlot(Slot slot, int slotId);
-
-	public String authoriseShoppingMall(AuthoriseUser user);
-
-	public List<Block> viewAllBlocksByShoppingMallId(int shoppingMallId);
+	
+	public void deleteSlot(int slotId);
+	
+	public List<Slot> viewAllSlots();
 
 	public List<Slot> viewAllSlotsByBlockId(int blockId);
 

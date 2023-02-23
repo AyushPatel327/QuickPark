@@ -1,15 +1,31 @@
 package com.quickPark.service;
 
-import static org.mockito.Mockito.verify;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.validation.constraints.AssertTrue;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.quickPark.entity.Customer;
+import com.quickPark.entity.Login;
+import com.quickPark.entity.MyBooking;
+import com.quickPark.entity.ShoppingMall;
 import com.quickPark.exceptions.CustomerNotPresentException;
 import com.quickPark.repository.CustomerRepository;
+import com.quickPark.repository.LoginRepository;
+import com.quickPark.repository.MyBookingRepository;
 
 /**
  * @author aypatel
@@ -17,25 +33,42 @@ import com.quickPark.repository.CustomerRepository;
  */
 @ExtendWith(MockitoExtension.class)
 public class CustomerServiceTest {
-	
 
 	private CustomerServiceImpl customerServiceImpl;
 
 	@Mock
 	private CustomerRepository customerRepository;
-	
+
+	@Mock
+	private LoginRepository loginRepository;
+
+	@Mock
+	private MyBookingRepository myBookingRepository;
+
 	@BeforeEach
-	void setup(){
-		 this.customerServiceImpl = new CustomerServiceImpl(this.customerRepository);
+	void setup() {
+		this.customerServiceImpl = new CustomerServiceImpl(this.customerRepository, this.loginRepository,
+				this.myBookingRepository);
 	}
 	
-	
+	private Customer customer;
+
+	@Test
+	void addCustomerTest() {
+
+		Login login = new Login();
+		Customer customer = new Customer(31, "Ravikishor", "ravikishor1@gmail.com", 9755468705L, "ravi#123", login);
+		loginRepository.save(login);
+		customerRepository.save(customer);
+
+		assertThat(customerServiceImpl.addCustomer(customer));
+	}
 
 	/*
 	 * @Mock private LoginRepository loginRepository;
 	 */
 
-	//private Customer customer;
+	// private Customer customer;
 
 	/*
 	 * @BeforeEach void customerIntializerSetup() throws Exception {
@@ -110,18 +143,51 @@ public class CustomerServiceTest {
 		 * List<Customer> customerList = customerServiceImpl.getAllCustomers();
 		 * assertEquals(customerList, Collections.singletonList(customer));
 		 */
-		
-		customerServiceImpl.getAllCustomers();
-		verify(customerRepository).findAll();
-		
+
+		List<Customer> customers = customerRepository.findAll();
+		Assertions.assertNotNull(customers);
+
 	}
-	
-//	@Test
-//	public void deleteCustomer () throws CustomerNotPresentException{
-//		
-//		customerServiceImpl.deleteCustomer(7);
-//		
-//		verify(customerRepository).deleteById(7);
-//	}
+
+	@Test
+	public void deleteCustomer() throws CustomerNotPresentException {
+
+		Login login = new Login();
+		Customer customer = new Customer(31, "Ravikishor", "ravikishor1@gmail.com", 9755468705L, "ravi#123", login);
+		loginRepository.save(login);
+		customerRepository.save(customer);
+
+		customerServiceImpl.deleteCustomer(customer.getCustomerId());
+		List<Customer> customers = customerRepository.findAll();
+
+		Assertions.assertFalse(customers.contains(customer));
+	}
+
+	@Test
+	public void viewAllBookingsByCustomerIdTest() {
+		ShoppingMall mall = new ShoppingMall();
+
+		Login login = new Login();
+		Customer customer = new Customer(31, "Ravikishor", "ravikishor1@gmail.com", 9755468705L, "ravi#123", login);
+		loginRepository.save(login);
+		customerRepository.save(customer);
+
+		MyBooking booking1 = new MyBooking(21, LocalDate.now(), LocalTime.now(), LocalTime.now().plusHours(1), "Booked",
+				"UPI", 10, "MP05AF1234", 2, mall, customer);
+		MyBooking booking2 = new MyBooking(21, LocalDate.now(), LocalTime.now(), LocalTime.now().plusHours(1), "Booked",
+				"UPI", 10, "MP05AF1234", 2, mall, customer);
+
+
+		List<MyBooking> myBookings = new ArrayList<>();
+		myBookings.add(booking1);
+		myBookings.add(booking2);
+
+		List<MyBooking> result = customerServiceImpl.viewBookingsByCustomerId(customer.getCustomerId());
+
+		Assertions.assertEquals(2, result.size());
+		Assertions.assertTrue(result.contains(booking1));
+		Assertions.assertTrue(result.contains(booking2));
+
+	}
 
 }
