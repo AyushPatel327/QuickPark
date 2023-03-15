@@ -1,0 +1,46 @@
+pipeline{
+    agent any
+    tools{maven 'MAVEN_HOME'}
+    stages{
+        stage('Checkout'){
+            steps{
+                git branch: 'main', url: 'https://github.com/AyushPatel327/QuickPark.git'
+            }
+                
+        }
+        stage ('Build'){
+            steps{
+                bat 'mvn -f "C:/Users/kmuppidi/Downloads/QuickPark-main/QuickPark-main/QuickPark/pom.xml" clean compile'
+            }
+        }
+        stage('git'){
+            steps{
+                git branch: 'main', url: 'https://github.com/AyushPatel327/QuickPark.git'
+            }
+        }
+        stage('Test'){
+            steps{
+             
+             bat 'mvn -f "C:/Users/kmuppidi/Downloads/QuickPark-main/QuickPark-main/QuickPark/pom.xml" clean test'           
+             }
+        }
+        stage('Package'){
+            steps{
+             bat 'mvn -f "C:/Users/kmuppidi/Downloads/QuickPark-main/QuickPark-main/QuickPark/pom.xml" clean package'           
+
+            }
+        }
+        stage('Code Review With SonarQube'){
+         steps{
+           withSonarQubeEnv('sonar-server') {
+             bat "mvn -file C:/Users/kmuppidi/Downloads/QuickPark-main/QuickPark-main/QuickPark/pom.xml sonar:sonar"
+        }
+            }
+}
+        stage('Deploy'){
+            steps{
+                bat 'java -jar/var/lib/workspace/QuickParkDeclarativePipeline/target/*.jar'
+             }
+         }
+    }
+}
